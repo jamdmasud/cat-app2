@@ -5,11 +5,12 @@ import { AllExceptionFilter } from './all.exception.filter';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
 import { GeneralGuard } from './guards/general.guard';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
-import { ConfigModule } from './config/config.module';
+import { SharedModule } from './shared/shared.module';
 
 @Module({
   imports: [
-    CatsModule
+    CatsModule,
+    SharedModule
   ],
   controllers: [],
   providers: [
