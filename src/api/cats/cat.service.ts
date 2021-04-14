@@ -1,40 +1,61 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { Cat } from './interfaces/cat';
+import {
+  Injectable,
+  Logger,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
+import { Cat } from './entities/cat.entity';
 
 @Injectable()
 export class CatService {
-    private readonly cats: Cat[] = [];
+  constructor(
+    @InjectRepository(Cat) private catRepository: Repository<Cat>,
+    private readonly logger: Logger,
+  ) {}
 
-    create(cat: CreateCatDto) {
-        const dto = { name: cat.name, age: cat.age, breed: cat.breed };
-        this.cats.push(dto);
-        return dto;
+  async create(dto: CreateCatDto): Promise<void> {
+    let cat: Cat = new Cat();
+    cat.name = dto.name;
+    cat.age = dto.age;
+    cat.color = dto.color;
+    await this.catRepository.insert(cat);
+    this.logger.log(cat, 'inserted cat');
+  }
+
+  async update(id: number, dto: UpdateCatDto) {
+    if (!id) {
+        this.logger.error('Cat ID is empty', null, 'ID varification');
+        throw new NotAcceptableException("Cat ID is not found");
     }
+    
+    await this.findOne(id);
 
-    update(cat: UpdateCatDto) {
-        const dto = { name: cat.name, age: cat.age, breed: cat.breed };
+    let cat: Cat = new Cat();
+    cat.name = dto.name;
+    cat.age = dto.age;
+    cat.color = dto.color;
+    await this.catRepository.update(id, cat);
+  }
 
-        this.cats.push(dto);
-        return dto;
+  async findOne(id: number): Promise<Cat> { 
+    let exit: Cat = await this.catRepository.findOne(id);
+    if (!exit) {
+        this.logger.error(`The Cat is not found in the database by ${id}`, null, 'Not found');
+        throw new NotFoundException("The cat is not found");
     }
-    findOne(id: number) {
-        if(!this.cats || this.cats.length <= 0)
-            throw new NotFoundException("No cat available at this moment.");
+    return exit;
+  }
 
-        if(this.cats.length <= id || id < 0){
-            throw new NotFoundException("The cat is not available");
-        }
+  async findAll(): Promise<Cat[]> {
+    return await this.catRepository.find();
+  }
 
-        return this.cats[id];
-    }
-
-    findAll(): Cat[] {
-        return this.cats;
-    }
-
-    delete(id: number) {
-        console.log(`data deleted for ${id}`);
-    }
+  async delete(id: number): Promise<void> {
+    await this.findOne(id);
+    await this.catRepository.delete(id);
+  }
 }

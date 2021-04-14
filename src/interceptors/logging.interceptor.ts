@@ -4,15 +4,14 @@ import { tap } from 'rxjs/operators';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    console.log('Before... ' );
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {    
     let request = context.switchToHttp().getRequest();
 
     const now = Date.now();
     return next
       .handle()
       .pipe(
-        tap(() => console.log(`After... ${Date.now() - now}ms`)),
+        tap(() => console.info(`Request processing time: ${Date.now() - now}ms`)),
       );
   }
 }

@@ -17,16 +17,15 @@ async function bootstrap() {
               winston.format.timestamp(),
               nestWinstonModuleUtilities.format.nestLike(),
             ),
-          }),
-          // other transports...
+          }), 
         ]
       })
     }
     );
 
   const options = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
+    .setTitle('NestJs API')
+    .setDescription('The NestJs API Swagger documentation')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, options);
