@@ -22,7 +22,7 @@ async function bootstrap() {
       })
     }
     );
-    //wait to get mirroring
+    //wait to get mirroring another testing
   const options = new DocumentBuilder()
     .setTitle('NestJs API')
     .setDescription('The NestJs API Swagger documentation')
